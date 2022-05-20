@@ -1,0 +1,4 @@
+computer move after human promotion
+computer promotion
+computer taking
+computer going for checks
