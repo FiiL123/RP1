@@ -687,7 +687,6 @@ class Board(tkinter.Frame):
                 moves = Pawn(pos, self).legal()
             else:
                 moves = Pawn(pos, self).attacking()
-                print('legalMoves', pos, moves)
             return moves
         elif piece in 'Nn':
             if default:
@@ -719,15 +718,30 @@ class Board(tkinter.Frame):
         return
 
     def computerMove(self):
+        # computer white logic TODO
         possible_moves = self.generateAllMoves(self.computerColor)
         possible_moves.sort(key=lambda y: y[2])
         best3 = possible_moves[:3]
         chosen = random.choice(best3)
-        print(chosen)
+        print('Chosed:', chosen)
         self.pressed(chosen[0])
         self.pressed(chosen[1])
 
     def generateAllMoves(self, color):
+        def getAttacked(pos, piece):
+            moves = []
+            if piece in 'Pp':
+                moves = Pawn(pos, self).attacking()
+            elif piece in 'Nn':
+                moves = Knight(pos, self).atprot()
+            elif piece in 'Rr':
+                moves = Rook(pos, self).atprot()
+            elif piece in 'Bb':
+                moves = Bishop(pos, self).atprot()
+            elif piece in 'Qq':
+                moves = Queen(pos, self).atprot()
+            return moves
+
         out = []
         if color:
             numofMoves = 0
@@ -739,7 +753,7 @@ class Board(tkinter.Frame):
                     mvs = white.copy()
                     mvs[i] = mvs.pop(pos)
                     print(pos, i, mvs[i], end=' | ')
-                    eval = self.getEval(mvs, self.black_pieces)
+                    eval = self.getEval(mvs, self.black_pieces, getAttacked(i, mvs[i]))
                     out.append((pos, i, eval))
                 if moves:
                     numofMoves += len(moves)
@@ -753,14 +767,14 @@ class Board(tkinter.Frame):
                     mvs = black.copy()
                     mvs[i] = mvs.pop(pos)
                     print(pos, i, mvs[i], end=' | ')
-                    eval = self.getEval(self.white_pieces, mvs)
+                    eval = self.getEval(self.white_pieces, mvs, getAttacked(i, mvs[i]))
                     out.append((pos, i, eval))
                 if moves:
                     numofMoves += len(moves)
         print('Num of moves:', numofMoves, color)
         return out
 
-    def getEval(self, white, black):
+    def getEval(self, white, black, attacked=[]):
         vals = {'K': 900, 'k': -900, 'Q': 90, 'q': -90, 'R': 50, 'r': -50, 'B': 30, 'b': -30, 'N': 30, 'n': -30,
                 'P': 10,
                 'p': -10, }
@@ -808,8 +822,20 @@ class Board(tkinter.Frame):
 
         eval = 0
         for k, v in white.items():
+            # white computer logic TODO
             eval += vals[v] + evalTables(v, k)
         for k, v in black.items():
+
+            if k in self.white_pieces.keys():
+                ''' taking is more advantageous'''
+                print('AAA', self.white_pieces[k])
+                eval += -(vals[self.white_pieces[k]])
+            if attacked != []:
+                print(self.getWkPos(), attacked)
+                if self.getWkPos() in attacked:
+                    '''checking is cool'''
+                    print('IS CHECK SON')
+                    eval -= 50
             eval += vals[v] + evalTables(v, k)
         print('Eval:', eval)
         return eval
