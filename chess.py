@@ -353,11 +353,13 @@ class Board(tkinter.Frame):
         self.attacked_squares_by_black = []
         self.white_pieces = {}
         self.black_pieces = {}
-        self.computerColor = False
+        self.computerColor = True
 
         # metody vytvarania
         self.createBoard()
         self.populateBoard()
+        if self.computerColor:
+            self.computerMove()
 
     def resetValues(self):
         self.selected_piece_moves = []
@@ -718,12 +720,14 @@ class Board(tkinter.Frame):
         return
 
     def computerMove(self):
-        # computer white logic TODO
         possible_moves = self.generateAllMoves(self.computerColor)
         possible_moves.sort(key=lambda y: y[2])
-        best3 = possible_moves[:3]
-        chosen = random.choice(best3)
-        print('Chosed:', chosen)
+        if self.computerColor:
+            best = possible_moves[-3:]
+        else:
+            best = possible_moves[:3]
+        chosen = random.choice(best)
+        print('Chosen:', chosen, best)
         self.pressed(chosen[0])
         self.pressed(chosen[1])
 
@@ -752,7 +756,7 @@ class Board(tkinter.Frame):
                 for i in moves:
                     mvs = white.copy()
                     mvs[i] = mvs.pop(pos)
-                    print(pos, i, mvs[i], end=' | ')
+                    # print(pos, i, mvs[i], end=' | ')
                     eval = self.getEval(mvs, self.black_pieces, getAttacked(i, mvs[i]))
                     out.append((pos, i, eval))
                 if moves:
@@ -766,7 +770,7 @@ class Board(tkinter.Frame):
                 for i in moves:
                     mvs = black.copy()
                     mvs[i] = mvs.pop(pos)
-                    print(pos, i, mvs[i], end=' | ')
+                    # print(pos, i, mvs[i], end=' | ')
                     eval = self.getEval(self.white_pieces, mvs, getAttacked(i, mvs[i]))
                     out.append((pos, i, eval))
                 if moves:
@@ -822,22 +826,27 @@ class Board(tkinter.Frame):
 
         eval = 0
         for k, v in white.items():
-            # white computer logic TODO
+            if k in self.black_pieces.keys():
+                ''' taking is more advantageous'''
+                if self.black_pieces != 'k':
+                    eval += vals[self.black_pieces[k]]
+            if attacked != []:
+                if self.getBkPos() in attacked:
+                    '''checking is cool'''
+                    eval += 50
             eval += vals[v] + evalTables(v, k)
-        for k, v in black.items():
 
+        for k, v in black.items():
             if k in self.white_pieces.keys():
                 ''' taking is more advantageous'''
-                print('AAA', self.white_pieces[k])
-                eval += -(vals[self.white_pieces[k]])
+                if self.white_pieces[k] != 'K':
+                    eval += -(vals[self.white_pieces[k]])
             if attacked != []:
-                print(self.getWkPos(), attacked)
                 if self.getWkPos() in attacked:
                     '''checking is cool'''
-                    print('IS CHECK SON')
                     eval -= 50
             eval += vals[v] + evalTables(v, k)
-        print('Eval:', eval)
+        # print('Eval:', eval)
         return eval
 
     def getKey(self, dictionary, val):
