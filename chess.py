@@ -353,7 +353,7 @@ class Board(tkinter.Frame):
         self.attacked_squares_by_black = []
         self.white_pieces = {}
         self.black_pieces = {}
-        self.computerColor = True
+        self.computerColor = None
 
         # metody vytvarania
         self.createBoard()
@@ -1018,7 +1018,13 @@ class Program:
         game_menu.add_command(label='Save', command=self.saveGame)
         game_menu.add_command(label='Exit', command=self.root.destroy)
 
+        computer_menu = Menu(menubar)
+        computer_menu.add_command(label='None', command=self.computerColorNone)
+        computer_menu.add_command(label='White', command=self.computerColorWhite)
+        computer_menu.add_command(label='Black', command=self.computerColorBlack)
+
         menubar.add_cascade(label="Game", menu=game_menu)
+        menubar.add_cascade(label="Computer player", menu=computer_menu)
 
         self.board.mainloop()
 
@@ -1034,6 +1040,18 @@ class Program:
     def saveGame(self):
         filename = filedialog.asksaveasfilename()
         self.board.savePositionFile(filename)
+
+    def computerColorNone(self):
+        self.board.computerColor = None
+        print(self.board.computerColor)
+
+    def computerColorWhite(self):
+        self.board.computerColor = True
+        print(self.board.computerColor)
+
+    def computerColorBlack(self):
+        self.board.computerColor = False
+        print(self.board.computerColor)
 
     def doAnimation(self):
         return
