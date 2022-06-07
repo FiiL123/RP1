@@ -417,14 +417,22 @@ class Board(tkinter.Frame):
     def populateBoard(self, file='start.json'):
         startpos = self.readPositionFile(file)
         for k, v in startpos.items():
-            self.squares[k].config(
-                image=self.IMAGE_ROOT[v], height=128, width=128)
-            if v in 'pnbrqk':
-                self.black_pieces[k] = v
-                if v == 'k': self.bk_pos = k
-            if v in 'PNBRQK':
-                self.white_pieces[k] = v
-                if v == 'K': self.wk_pos = k
+            if k == 'computerColor':
+                if v == 'None':
+                    self.computerColor = None
+                else:
+                    self.computerColor = v
+            else:
+                self.squares[k].config(
+                    image=self.IMAGE_ROOT[v], height=128, width=128)
+                if v in 'pnbrqk':
+                    self.black_pieces[k] = v
+                    if v == 'k': self.bk_pos = k
+                elif v in 'PNBRQK':
+                    self.white_pieces[k] = v
+                    if v == 'K': self.wk_pos = k
+
+        print("CC:", self.computerColor)
 
     def makeSquareNames(self):
         file_names = ["a", "b", "c", "d", "e", "f", "g", "h"]
@@ -916,6 +924,11 @@ class Board(tkinter.Frame):
                 game_board[k] = self.getPiece(k)
             else:
                 game_board[k] = 'e'
+        if self.computerColor is None:
+            game_board['computerColor'] = "None"
+        else:
+            game_board['computerColor'] = self.computerColor
+
         with open(path, 'w') as outFile:
             json.dump(game_board, outFile, indent=4)
 
