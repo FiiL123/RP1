@@ -793,7 +793,7 @@ class Board(tkinter.Frame):
 
         def evalTables(piece, pos):
             pos = 63 - self.SQUARE_NAMES.index(pos)
-            pawns = [0, 0, 0, 0, 0, 0, 0, 0, 50, 50, 50, 50, 50, 50, 50, 50, 10, 10, 20, 30, 30, 20, 10, 10, 5,
+            pawns = [50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 10, 10, 20, 30, 30, 20, 10, 10, 5,
                      5, 10,
                      25, 25, 10, 5, 5, 0, 0, 0, 20, 20, 0, 0, 0, 5, -5, -10, 0, 0, -10, -5, 5, 5, 10, 10, -20, -20, 10,
                      10, 5, 0, 0, 0, 0, 0, 0, 0, 0]
@@ -950,23 +950,29 @@ class Board(tkinter.Frame):
 
         if self.getPiece(pos) in 'pP':
             if pos[1] in '18':
-                promotion_window = tkinter.Tk()
-                promotion_window.title('What do you wish to promote to')
-                if self.getColor(pos):
-                    promoButton1 = tkinter.Button(promotion_window, text=chr(9816), font='Arial 50',
-                                                  command=lambda: return_piece('N'))
-                    promoButton1.grid(row=0, column=0)
-                    promoButton2 = tkinter.Button(promotion_window, text=chr(9815), font='Arial 50',
-                                                  command=lambda: return_piece('B'))
-                    promoButton2.grid(row=0, column=1)
-                    promoButton3 = tkinter.Button(promotion_window, text=chr(9814), font='Arial 50',
-                                                  command=lambda: return_piece('R'))
-                    promoButton3.grid(row=0, column=2)
-                    promoButton4 = tkinter.Button(promotion_window, text=chr(9813), font='Arial 50',
-                                                  command=lambda: return_piece('Q'))
-                    promoButton4.grid(row=0, column=3)
+                if self.getColor(pos) == self.computerColor == True:
+                    self.squares[pos].config(image=self.IMAGE_ROOT['Q'])
+                    self.white_pieces[pos] = 'Q'
+                elif self.getColor(pos) == self.computerColor == False:
+                    self.squares[pos].config(image=self.IMAGE_ROOT['q'])
+                    self.white_pieces[pos] = 'q'
                 else:
-                    for i in 'nbrq':
+                    promotion_window = tkinter.Tk()
+                    promotion_window.title('What do you wish to promote to')
+                    if self.getColor(pos):
+                        promoButton1 = tkinter.Button(promotion_window, text=chr(9816), font='Arial 50',
+                                                      command=lambda: return_piece('N'))
+                        promoButton1.grid(row=0, column=0)
+                        promoButton2 = tkinter.Button(promotion_window, text=chr(9815), font='Arial 50',
+                                                      command=lambda: return_piece('B'))
+                        promoButton2.grid(row=0, column=1)
+                        promoButton3 = tkinter.Button(promotion_window, text=chr(9814), font='Arial 50',
+                                                      command=lambda: return_piece('R'))
+                        promoButton3.grid(row=0, column=2)
+                        promoButton4 = tkinter.Button(promotion_window, text=chr(9813), font='Arial 50',
+                                                      command=lambda: return_piece('Q'))
+                        promoButton4.grid(row=0, column=3)
+                    else:
                         promoButton1 = tkinter.Button(promotion_window, text=chr(9822), font='Arial 50',
                                                       command=lambda: return_piece('n'))
                         promoButton1.grid(row=0, column=0)
@@ -980,7 +986,7 @@ class Board(tkinter.Frame):
                                                       command=lambda: return_piece('q'))
                         promoButton4.grid(row=0, column=3)
 
-                promotion_window.mainloop()
+                    promotion_window.mainloop()
             return
 
     def castles(self, pos):
