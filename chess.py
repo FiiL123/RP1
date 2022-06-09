@@ -354,6 +354,8 @@ class Board(tkinter.Frame):
         self.white_pieces = {}
         self.black_pieces = {}
         self.computerColor = None
+        self.computerLevel1 = True
+        self.computerLevel2 = True
 
         # metody vytvarania
         self.createBoard()
@@ -498,7 +500,7 @@ class Board(tkinter.Frame):
                     self.isMaterialDraw()
                     self.isStalemate()
 
-                    # self.animate(self.on_turn)
+                    self.animate(self.on_turn)
                     self.selected_piece_moves = []
                     self.sq1 = None
                     self.on_turn = not self.on_turn
@@ -833,27 +835,28 @@ class Board(tkinter.Frame):
                 return 0
 
         eval = 0
-        for k, v in white.items():
-            if k in self.black_pieces.keys():
-                ''' taking is more advantageous'''
-                if self.black_pieces != 'k':
-                    eval += vals[self.black_pieces[k]]
-            if attacked != []:
-                if self.getBkPos() in attacked:
-                    '''checking is cool'''
-                    eval += 50
-            eval += vals[v] + evalTables(v, k)
+        if self.computerLevel1:
+            for k, v in white.items():
+                if k in self.black_pieces.keys():
+                    ''' taking is more advantageous'''
+                    if self.black_pieces != 'k':
+                        eval += vals[self.black_pieces[k]]
+                if attacked != [] and self.computerLevel2:
+                    if self.getBkPos() in attacked:
+                        '''checking is cool'''
+                        eval += 50
+                eval += vals[v] + evalTables(v, k)
 
-        for k, v in black.items():
-            if k in self.white_pieces.keys():
-                ''' taking is more advantageous'''
-                if self.white_pieces[k] != 'K':
-                    eval += -(vals[self.white_pieces[k]])
-            if attacked != []:
-                if self.getWkPos() in attacked:
-                    '''checking is cool'''
-                    eval -= 50
-            eval += vals[v] + evalTables(v, k)
+            for k, v in black.items():
+                if k in self.white_pieces.keys():
+                    ''' taking is more advantageous'''
+                    if self.white_pieces[k] != 'K':
+                        eval += -(vals[self.white_pieces[k]])
+                if attacked != [] and self.computerLevel2:
+                    if self.getWkPos() in attacked:
+                        '''checking is cool'''
+                        eval -= 50
+                eval += vals[v] + evalTables(v, k)
         # print('Eval:', eval)
         return eval
 
@@ -1042,8 +1045,14 @@ class Program:
         computer_menu.add_command(label='White', command=self.computerColorWhite)
         computer_menu.add_command(label='Black', command=self.computerColorBlack)
 
+        computer_level = Menu(menubar)
+        computer_level.add_command(label='Level 0', command=self.computerLevel0)
+        computer_level.add_command(label='Level 1', command=self.computerLevel1)
+        computer_level.add_command(label='Level 2', command=self.computerLevel2)
+
         menubar.add_cascade(label="Game", menu=game_menu)
         menubar.add_cascade(label="Computer player", menu=computer_menu)
+        menubar.add_cascade(label="Computer difficulty", menu=computer_level)
 
         self.board.mainloop()
 
@@ -1071,6 +1080,18 @@ class Program:
     def computerColorBlack(self):
         self.board.computerColor = False
         print(self.board.computerColor)
+
+    def computerLevel0(self):
+        self.board.computerLevel1 = False
+        self.board.computerLevel2 = False
+
+    def computerLevel1(self):
+        self.board.computerLevel1 = True
+        self.board.computerLevel2 = False
+
+    def computerLevel2(self):
+        self.board.computerLevel1 = True
+        self.board.computerLevel2 = True
 
     def doAnimation(self):
         return
