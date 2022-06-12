@@ -612,7 +612,7 @@ class Board(tkinter.Frame):
             print('white in check:', self.white_in_check, 'black in check:', self.black_in_check)
 
     def removeIllegal(self, color, moves, pos):
-        out = [i for i in moves]
+        out = moves.copy()
         if color:
             check = self.white_in_check
             if self.getPiece(pos) == 'K':
